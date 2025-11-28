@@ -1,0 +1,49 @@
+name: Build LaTeX and Release PDF
+
+on: workflow_dispatch
+
+env:
+  ROOT_LATEX_FILE: "main.tex" # 设置你的主 LaTeX 文件名称
+
+jobs:
+  build-and-release:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write # 赋予工作流写入 Release 的权限
+
+    steps:
+      - name: Checkout repository code
+        uses: actions/checkout@v4
+
+      - name: Compile LaTeX document
+        uses: xu-cheng/latex-action@v3
+        with:
+            root_file: main.tex
+            compiler: xelatex
+            args: |
+              -shell-escape
+              -interaction=nonstopmode
+              -file-line-error
+            post_compile: |
+              # 多次编译确保引用正确
+              xelatex -shell-escape -interaction=nonstopmode -file-line-error main.tex
+              xelatex -shell-escape -interaction=nonstopmode -file-line-error main.tex
+              xelatex -shell-escape -interaction=nonstopmode -file-line-error main.tex
+
+      - name: Create or Overwrite GitHub Release
+        uses: softprops/action-gh-release@v1
+        with:
+          tag_name: ${{ github.ref_name }} # 使用触发工作流的标签
+          name: Advanced Algebraic Geometry 2025fall
+          body: |
+            Automated release for ${{ github.ref_name }}.
+            This PDF was automatically built from the LaTeX source.
+          files: |
+            # 下面的路径是 latex-action 的默认输出路径
+            # 请根据你上一步的实际输出PDF文件名修改 'main.pdf'
+            main.pdf
+          draft: false
+          prerelease: false
+          replace_assets: true # 覆盖已存在的资源文件（实现覆盖Release的关键）
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
