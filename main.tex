@@ -2150,8 +2150,8 @@ There is also an induced tangent map $T_{x}\varphi: T_{x}X \rightarrow T_{y}Y$.
     Let $Z = \{x\in X \big{|} \varphi \text{ is not smooth at } x\}$ which by Proposition \ref{Proposition 5.4} is closed in $X$.
     If $Z = \varnothing$, then take $V = Y$ and we are done.
     \par
-    For all irreducible component $Y'$ of $\overline{\varphi(Z)}$,
-    we can pick an irreducible component $X'$ of $Z$ such that $\varphi\big{|}_{X'}$ is dominant.
+    For all irreducible component $Y'$ of $\overline{\varphi(Z)}$, $\varphi^{-1}(Y')$ is union of some irreducible components of $Z$.
+    by irreducibility of $Y'$, we can pick some irreducible component $X'$ of $Z$ such that $\overline{\varphi(X')} = Y'$ and hence $\varphi\big{|}_{X'}$ is dominant.
     By Proposition \ref{Proposition 5.6}, there exist smooth open dense subsets $U' \subseteq X'$ and $V' \subseteq Y'$ such that $\varphi\big{|}_{U'}: U' \rightarrow V'$ is a smooth morphism.
     Hence for $x\in U'$, $\dim Y' = \dim_{k} T_{\varphi(x)}V' = \dim_{k} T_{x}\varphi\big{|}_{U'}(T_{x}U') \le \dim_{k} T_{x}\varphi(T_{x}X) < \dim_{k} T_{\varphi(y)}Y = \dim Y$.
     Thus $\overline{\varphi(Z)} \subsetneq Y$.
