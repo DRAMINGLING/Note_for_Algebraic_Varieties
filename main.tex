@@ -2111,9 +2111,24 @@ There is also an induced tangent map $T_{x}\varphi: T_{x}X \rightarrow T_{y}Y$.
     By Proposition \ref{Proposition 5.3}, 
     there is always an open dense subset $V$ of $Y$ consists of smooth points in $Y$.
     \par
-    For all $\alpha = (\beta, t)$ with $\beta\in V$, we get that $T_{\alpha}X$ is defined by equations $S \cup \{\sum_{j} \frac{\partial G}{\partial x_{j}}(\alpha)x_{j}\}$,
+    For all $\alpha = (\beta, t)$ in $\varphi^{-1}(V)$, we get that $T_{\alpha}X$ is defined by equations $S \cup \{\sum_{j} \frac{\partial G}{\partial x_{j}}(\alpha)x_{j}\}$,
     where $S$ is the set of defining equations of $T_{\beta}Y$.
-    Note that each fiber of $\varphi$ is isomorphic to $\mathbb{A}_{k}^{1}$, 
+    Take $U = D(\frac{\partial G}{\partial x_{n}}) \cap \varphi^{-1}(V)$.
+    As $G$ is the minimal polynomial of $x_{m + 1}$ over $K(Y)$, 
+    $\frac{\partial G}{\partial x_{m + 1}}$ would not vanish on $X$ so that $U$ is nonempty.
+    \par
+    Hence for $\alpha\in U$, $\dim_{k} T_{\alpha}X = \dim_{k} T_{\beta}Y$.
+    Note that each fiber of $\varphi$ is isomorphic to $\mathbb{A}_{k}^{1}$, by Corollary \ref{Corollary 4.8}, 
+    $\dim X = \dim Y + 1 = \dim_{k} T_{\beta}Y + 1 = \dim_{k} T_{\alpha}X$ so that $X$ is smooth at $\alpha$.
+    In addition, the following matrix has rank 
+    \begin{equation}
+        \begin{pmatrix}
+            M & 0 \\
+            \cdots & \frac{\partial G}{\partial x_{m + 1}}(\alpha) \\
+            I_{m} & 0
+        \end{pmatrix}
+    \end{equation}
+    where 
 \end{proof}
 \begin{example}
     When $\characteristic k = p$, generic smoothness would fail.
