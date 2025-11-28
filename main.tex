@@ -2060,7 +2060,15 @@ There is also an induced tangent map $T_{x}\varphi: T_{x}X \rightarrow T_{y}Y$.
     \end{equation}
     On the other hand, for all $y\in Z$, by Lemma \ref{Lemma 5.9},
     there exist affine open neighbourhood $U\ni y$ and a regular sequence $f_{1}, \cdots, f_{r}$ in $A(U)$ such that $Z \cap U$ is an irreducible component of $V(f_{1}, \cdots, f_{r})$.
-    
+    As continuous map sending irreducible sets to irreducible sets, $\varphi^{-1}(Z \cap U)$ would be union of some irreducible components of $\varphi^{-1}(V(f_{1}, \cdots, f_{r})) = V(f_{1} \circ \varphi, \cdots, f_{r} \circ \varphi_{r})$.
+    By Krull's Principal Ideal Theorem, those irreducible components should be of codimension at most $r$ in $\varphi^{-1}(U)$.
+    \par
+    Note that for each irreducible component $Z_{0}$ of $\varphi^{-1}(Z)$ and $z\in Z_{0}$ mapping to $y$,
+    $Z_{0} \cap \varphi^{-1}(U)$ is an irreducible component of $\varphi^{-1}(Z \cap U)$.
+    Hence $\codim Z_{0} = \codim Z_{0} \cap \varphi^{-1}(U) \le r$ in $X$.
+    Since $X$ is irreducible, by Theorem \ref{Theorem 4.2}, $\dim T_{z}\varphi^{-1}(Z) \ge \dim \varphi^{-1}(Z) \ge \dim X - r$.
+    Thus $\dim T_{z}\varphi^{-1}(Z) = \dim \varphi^{-1}(Z) = \dim X - r$.
+    As $X$ is irreducible, $\varphi^{-1}(Z)$ is smooth.
 \end{proof}
 \begin{remark}
     For $\varphi: X \rightarrow Y$ between smooth projective varieties,
