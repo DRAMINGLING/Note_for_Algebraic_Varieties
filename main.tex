@@ -2107,7 +2107,7 @@ There is also an induced tangent map $T_{x}\varphi: T_{x}X \rightarrow T_{y}Y$.
     \par
     By definition, $G(x_{m + 1})\in I(X)$.
     In addition, since $\varphi$ is the projection,
-    by Euclidean division, we get $I(X) = (I(Y), G(x_{m + 1}))$.
+    by Euclidean division, we get $I(X) = (I(Y), G(x_{m + 1}))$ so that $\dim X = \dim Y$.
     By Proposition \ref{Proposition 5.3}, 
     there is always an open dense subset $V$ of $Y$ consists of smooth points in $Y$.
     \par
@@ -2117,10 +2117,9 @@ There is also an induced tangent map $T_{x}\varphi: T_{x}X \rightarrow T_{y}Y$.
     As $G$ is the minimal polynomial of $x_{m + 1}$ over $K(Y)$, 
     $\frac{\partial G}{\partial x_{m + 1}}$ would not vanish on $X$ so that $U$ is nonempty.
     \par
-    Hence for $\alpha\in U$, $\dim_{k} T_{\alpha}X = \dim_{k} T_{\beta}Y$.
-    Note that each fiber of $\varphi$ is isomorphic to $\mathbb{A}_{k}^{1}$, by Corollary \ref{Corollary 4.8}, 
-    $\dim X = \dim Y + 1 = \dim_{k} T_{\beta}Y + 1 = \dim_{k} T_{\alpha}X$ so that $X$ is smooth at $\alpha$.
-    In addition, the following matrix has rank 
+    Hence for $\alpha\in U$, $\dim_{k} T_{\alpha}X = \dim_{k} T_{\beta}Y$. 
+    Thus $\dim X = \dim Y = \dim_{k} T_{\beta}Y = \dim_{k} T_{\alpha}X$ so that $X$ is smooth at $\alpha$.
+    In addition, for all $\alpha\in U$, the following matrix has rank $m + 1$
     \begin{equation}
         \begin{pmatrix}
             M & 0 \\
@@ -2128,7 +2127,10 @@ There is also an induced tangent map $T_{x}\varphi: T_{x}X \rightarrow T_{y}Y$.
             I_{m} & 0
         \end{pmatrix}
     \end{equation}
-    where 
+    where $M$ represents the defining equations in $S$.
+    Hence $\ker T_{\alpha}\varphi = 0$.
+    As $\dim_{k} T_{\alpha}X = \dim_{k} T_{\beta}Y$, $T_{\alpha}\varphi$ is surjective for all $\alpha\in U$.
+    Conclude that $\varphi\big{|}_{U}: U \rightarrow V$ is a smooth morphism.
 \end{proof}
 \begin{example}
     When $\characteristic k = p$, generic smoothness would fail.
