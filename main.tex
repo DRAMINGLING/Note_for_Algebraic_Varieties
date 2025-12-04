@@ -94,6 +94,9 @@
 \newcommand{\speciallineargroup}[2]{\operatorname{SL}_{#1}(#2)}
 \newcommand{\projectivespeciallineargroup}[2]{\operatorname{PSL}_{#1}(#2)}
 
+\newcommand{\order}{\operatorname{ord}}
+\newcommand{\divisor}{\operatorname{div}}
+
 \title{代数簇}
 \author{}
 \date{}
@@ -2597,8 +2600,8 @@ With discussion above, we successfully give a group structure on $\picardscheme(
     where $\mathcal{O}_{\mathbb{P}_{k}^{n}}(1) \boxtimes \mathcal{O}_{\mathbb{P}_{k}^{m}}(1) := p^{\ast}\mathcal{O}_{\mathbb{P}_{k}^{n}}(1) \otimes q^{\ast}\mathcal{O}_{\mathbb{P}_{k}^{m}}(1)$ with $p, q$ projections.
 \end{example}
 
-\subsection{Divisors}
-\label{subsection:Divisors_Divisors}
+\subsection{Weil divisors}
+\label{subsection:Divisors_Weil_divisors}
 
 \begin{definition}
     Let $X$ be an irreducible variety.
@@ -2628,4 +2631,6 @@ And $v_{Y}(f) := n$ is our desired vanishing order.
     Then $h_{1}g_{1}^{n_{1}} = h_{1}a^{n_{1}}g^{n_{1}}$ and $h_{1} = h_{2}b^{n_{1}}g_{2}^{n_{2} - n_{1}}$.
     Note that $g_{1} \nmid h_{1}$, we get that $g_{2} \nmid h_{1}$ so that $n_{1} = n_{2}$.
 \end{proof}
+Under the assumption $\codim \singular (X) \ge 2$,
+for all regular function $f$, we can define 
 \end{document}
