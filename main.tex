@@ -2631,6 +2631,26 @@ And $v_{Y}(f) := n$ is our desired vanishing order.
     Then $h_{1}g_{1}^{n_{1}} = h_{1}a^{n_{1}}g^{n_{1}}$ and $h_{1} = h_{2}b^{n_{1}}g_{2}^{n_{2} - n_{1}}$.
     Note that $g_{1} \nmid h_{1}$, we get that $g_{2} \nmid h_{1}$ so that $n_{1} = n_{2}$.
 \end{proof}
-Under the assumption $\codim \singular (X) \ge 2$,
-for all regular function $f$, we can define 
+\begin{remark}
+    Similarly, for rational function $f\in K(X)$, we can also define vanishing order $v_{Y}(f)$.
+\end{remark}
+\begin{lemma}
+    Let $X$ be an irreducible variety.
+    Then for all rational function $f\in K(X)^{\ast}$, $v_{Y}(f) = 0$ except for finitely many irreducible subvarieties $Y$ of codimension $1$.
+    \label{Lemma 7.4}
+\end{lemma}
+\begin{proof}
+    Assume $v_{Y}(f) \neq 0$.
+    For $y\in Y$ smooth, there exists an affine open neighbourhood $U$ such that $f = \frac{f_{1}}{f_{2}}$ with $f_{1},f_{2}\in A(U)$.
+    Then $v_{Y}(f_{1}) \neq v_{Y}(f_{2})$.
+    Suffices to show the result holds for regular function.
+    \par
+    Now $f$ is a regular function.
+    As $v_{Y}(f) \neq 0$, by definition, this is equivalent to $g \mid f$ so that $Y \cap U = V(g) \subseteq V(f)$ in $U$.
+    Take closure in $X$, then we get $Y \subseteq V(f)$.
+    Note that $V(f)$ has finitely many irreducible components, we are done. 
+\end{proof}
+Under the assumption $\codim \singular (X) \ge 2$, with lemmas above,
+for all regular function $f$, we can define a Weil divisor $\divisor (f) = \sum_{Y} v_{Y}(f)Y$.
+
 \end{document}
