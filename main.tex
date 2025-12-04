@@ -2530,7 +2530,7 @@ here we give an equivalent definition of line bundle first.
         \item an open covering $\{U_{i}\}$ of $X$
         \item transition functions $g_{ij}: U_{i} \cap U_{j} \rightarrow k^{\ast}$ satisfying the cocycle condition
     \end{itemize}
-    under the equivalent relation $(\{U_{i}\}, g_{ij}) \sim (\{V_{i'}\}, g_{i'j'}')$ if there exist regular functions $s_{ii'}: U_{i} \cap V_{i'} \rightarrow k^{\ast}$ such that $g_{i'j'}'s_{ii'} = g_{ij}s_{jj'}$ for all $i, j, i', j'$.
+    under the equivalent relation that $(\{U_{i}\}, g_{ij}) \sim (\{V_{i'}\}, g_{i'j'}')$ if there exist regular functions $s_{ii'}: U_{i} \cap V_{i'} \rightarrow k^{\ast}$ such that $g_{i'j'}'s_{ii'} = g_{ij}s_{jj'}$ for all $i, j, i', j'$.
 \end{definition}
 \begin{remark}
     More precisely, such an equivalence class would one-to-one correspond to an isomorphism class of our original definition instead of just a morphism.
@@ -2660,4 +2660,16 @@ for all rational function $f$, we can define a Weil divisor $\divisor (f) = \sum
     (2)Let $\mathbb{P}_{k}^{n}$ be projective space.
     Then $\divisor (\frac{x_{i}}{x_{j}}) = V(x_{i}) - V(x_{j})$. 
 \end{example}
+
+\subsection{Cartier divisors}
+\label{subsection:Divisors_Cartier_divisors}
+
+\begin{definition}
+    A Cartier divisor is an equivalence class of a collection of data
+    \begin{itemize}
+        \item an open covering $\{U_{i}\}$ of $X$.
+        \item rational functions $f_{i}: U_{i} \dashrightarrow \mathbb{A}_{k}^{1}$ not vanishing on each irreducible component of $U_{i}$ such that $\frac{f_{i}}{f_{j}}$ is a regular function on $U_{i} \cap U_{j}$ nowhere vanishing
+    \end{itemize}
+    under the equivalent relation that $(\{U_{i}\}, f_{i}) \sim (\{V_{j}\}, g_{j})$ if $\frac{f_{i}}{g_{j}}$ is a regular function on $U_{i} \cap V_{j}$ nowhere vanishing.
+\end{definition}
 \end{document}
