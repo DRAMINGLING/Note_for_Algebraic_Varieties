@@ -2665,11 +2665,28 @@ for all rational function $f$, we can define a Weil divisor $\divisor (f) = \sum
 \label{subsection:Divisors_Cartier_divisors}
 
 \begin{definition}
-    A Cartier divisor is an equivalence class of a collection of data
+    Let $X$ be an irreducible variety.
+    A Cartier divisor on $X$ is an equivalence class of a collection of data
     \begin{itemize}
         \item an open covering $\{U_{i}\}$ of $X$.
         \item rational functions $f_{i}: U_{i} \dashrightarrow \mathbb{A}_{k}^{1}$ not vanishing on each irreducible component of $U_{i}$ such that $\frac{f_{i}}{f_{j}}$ is a regular function on $U_{i} \cap U_{j}$ nowhere vanishing
     \end{itemize}
     under the equivalent relation that $(\{U_{i}\}, f_{i}) \sim (\{V_{j}\}, g_{j})$ if $\frac{f_{i}}{g_{j}}$ is a regular function on $U_{i} \cap V_{j}$ nowhere vanishing.
 \end{definition}
+Just as we did for line bundles, it is natural to give a group structure on the set of Cartier divisors, denoted by $Catier(X)$.
+We say a Cartier divisor is effective if it can be represented by $(\{U_{i}\}, f_{i})$ with $f_{i}$ all regular functions.
+We say a Cartier divisor is principal if it can be represented by $(X, f)$ with $f\in K(X)$.
+\par
+Under the assumption $\codim \singular (X) \ge 2$,
+there is a natural group homomorphism $\pi: Catier(X) \rightarrow Weil(X)$ sending $(\{U_{i}\}, f_{i})$ to $\sum v_{Y}(D)Y$,
+where $v_{Y}(D) := v_{U_{i} \cap Y}(f_{i})$ for $Y$ meeting $U_{i}$.
+Clearly, this is well defined.
+In particular, $\pi((X, f)) = \divisor (f)$.
+\begin{remark}
+    In general, $\pi$ is neither injective nor surjective.
+    \begin{itemize}
+        \item when $X$ is smooth, $\pi$ is smooth.
+        \item when $X$ is normal, $\pi$ is injective.
+    \end{itemize}
+\end{remark}
 \end{document}
