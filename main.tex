@@ -2530,7 +2530,7 @@ here we give an equivalent definition of line bundle first.
     under the equivalent relation $(\{U_{i}\}, g_{ij}) \sim (\{V_{i'}\}, g_{i'j'}')$ if there exist regular functions $s_{ii'}: U_{i} \cap V_{i'} \rightarrow k^{\ast}$ such that $g_{i'j'}'s_{ii'} = g_{ij}s_{jj'}$ for all $i, j, i', j'$.
 \end{definition}
 \begin{remark}
-    More precisely, such an equivalence would one-to-one correspond to an isomorphism class of our original definition instead of just a morphism.
+    More precisely, such an equivalence class would one-to-one correspond to an isomorphism class of our original definition instead of just a morphism.
 \end{remark}
 Given a line bundle $L = (\{U_{i}\}, g_{ij})$, then $L^{-1} := (\{U_{i}\}, g_{ij}^{-1})$ is a well defined line bundle.
 Given two line bundles $L_{1}$ and $L_{2}$, by taking refinement of open covering, 
@@ -2553,7 +2553,7 @@ With discussion above, we successfully give a group structure on $\picardscheme(
     Let $S = k[x_{0}, \cdots, x_{n}]$.
     In fact, for all $d \ge 0$, $\Gamma(\mathbb{P}_{k}^{n}, \mathcal{O}_{\mathbb{P}_{k}^{n}}(d)) = S_{d}$.
     Moreover, for all negative $d$, $\Gamma(\mathbb{P}_{k}^{n}, \mathcal{O}_{\mathbb{P}_{k}^{n}}(d)) = \{0\}$.
-    \label{Proposition 8.1}
+    \label{Proposition 7.1}
 \end{proposition}
 \begin{proof}
     Obviously, for all $t$, as $\frac{x_{t}^{d}}{x_{i}^{d}} = \frac{x_{j}^{d}}{x_{i}^{d}} \cdot \frac{x_{t}^{d}}{x_{j}^{d}}$,
@@ -2611,5 +2611,11 @@ Then for all regular function $f: X \rightarrow \mathbb{A}_{k}^{1}$,
 we can define vanishing order $v_{Y}(f)$ of $f$ along an irreducible subvariety $Y \subseteq X$ of codimension $1$.
 \par
 Since $\codim \singular (X) \ge 2$, a general point $y\in Y$ is a smooth point of $X$.
-Then there exists  
+Then by Proposition \ref{Proposition 5.3}, there exists an affine open neighbourhood $U$ of $y$ such that $Y \cap U$ is defined by a single equation $g$.
+As $\mathcal{O}_{X, y}$ is a UFD, we can write $f = hg^{n}$ in $\mathcal{O}_{X, y}$, where $g \nmid h$.
+And $v_{Y}(f) := n$ is our desired vanishing order.
+\begin{lemma}
+    The definition of $v_{Y}(f)$ is independent of choice of $y$.
+    \label{Lemma 7.3}
+\end{lemma}
 \end{document}
