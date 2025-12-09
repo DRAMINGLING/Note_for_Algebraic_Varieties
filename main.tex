@@ -2765,9 +2765,22 @@ In particular, $\pi((X, f)) = \divisor (f)$.
 \begin{remark}
     In general, for smooth projective varieties $X$ and $Y$, 
     we do not have that $\picardscheme (X \times Y) = \picardscheme (X) \times \picardscheme (Y)$.
-    For example, for projective curve $X \not\cong \mathbb{P}_{k}^{1}$,
-    we can verify that line bundles in $\picardscheme (\Delta_{X})$ do not come from $\picardscheme (X) \times \picardscheme (X)$.
+    And the following proposition would give us an example.
 \end{remark}
+\begin{proposition}
+    Let $X$ be a smooth projective curve not isomorphic to projective line $\mathbb{P}_{k}^{1}$.
+    Then $\Delta_{X} \subseteq X \times X$ is an irreducible subvariety of codimension $1$ and the associated line bundle $\mathcal{L}(\Delta_{X})$ does not come from $\picardscheme (X) \times \picardscheme (X)$.
+    \label{Proposition 7.3}
+\end{proposition}
+\begin{proof}
+    Since $X \subseteq \mathbb{P}_{k}^{2}$ is a smooth projective curve not isomorphic to projective line,
+    we may assume that $X = V(f)$ for some irreducible homogeneous polynomial $f$ of degree greater than $1$.
+    Denote coordinate of $\mathbb{P}_{k}^{2} \times \mathbb{P}_{k}^{2}$ by $x_{0}, x_{1}, x_{2}, y_{0}, y_{1}, y_{2}$.
+    Then $X \times X$ is defined by $\{f(x_{0}, x_{1}, x_{2}), f(y_{0}, y_{1}, y_{2})\}$.
+    \par
+    Note that $\delta_{\mathbb{P}_{k}^{2}} \subseteq \mathbb{P}_{k}^{2} \times \mathbb{P}_{k}^{2}$ is defined by $\{x_{0}y_{1} = x_{1}y_{0}, x_{0}y_{2} = x_{2}y_{0}, x_{1}y_{2} = x_{2}y_{1}\}$, which is an irreducible subvariety of codimension $1$,
+    we get that $\delta_{X}$ is defined
+\end{proof}
 Let $X$ be a smooth projective curve.
 Then any divisor $D$ on $X$ is a finite sum $\sum_{i} n_{i}p_{i}$ with $p_{i}$ points in $X$.
 Set $\deg D = \sum_{i} n_{i}$.
