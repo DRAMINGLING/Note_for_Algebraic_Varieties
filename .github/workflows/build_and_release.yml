@@ -33,10 +33,10 @@ jobs:
       - name: Create or Overwrite GitHub Release
         uses: softprops/action-gh-release@v1
         with:
-          tag_name: ${{ github.ref_name }} # 使用触发工作流的标签
+          tag_name: release
           name: Algebraic Varieties
           body: |
-            Automated release for ${{ github.ref_name }}.
+            Automated release.
             This PDF was automatically built from the LaTeX source.
           files: |
             # 下面的路径是 latex-action 的默认输出路径
