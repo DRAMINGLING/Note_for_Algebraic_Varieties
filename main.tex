@@ -1093,9 +1093,6 @@ From now on, by a morphism of varieties, we mean a regular map.
     Then a general fiber of $f$ is finite if and only if the corresponding field extension $f^{\ast}: K(Y) \hookrightarrow K(X)$ is a finite extension.
     \label{Theorem 4.5}
 \end{theorem}
-\begin{remark}
-    In this case, $\dim X = \dim Y$ and for general $y$, $\sharp f^{-1}(y) \le [K(X) : K(Y)]$ taking equality when $\characteristic k = 0$.
-\end{remark}
 \begin{proof}
     Assume $X \subseteq \mathbb{A}_{k}^{n}$ and $Y \subseteq \mathbb{A}_{k}^{m}$.
     Consider graph $\Gamma_{f}$ of $f$, there is a commutative diagram
@@ -1148,7 +1145,13 @@ From now on, by a morphism of varieties, we mean a regular map.
 \end{proof}
 \begin{remark}
     When we replace $X$ by $\Gamma_{f}$, we in fact transfer imformation about $f$ into $I(X)$ while the new $f$ becomes trivial.
+    In addition, $\dim X = \dim Y$ and for general $y$, $\sharp f^{-1}(y) \le [K(X) : K(Y)]$ taking equality when $\characteristic k = 0$.
 \end{remark}
+\begin{example}
+    For the case that $\characteristic k = p$,
+    take morphism $f: X = \mathbb{A}_{k}^{1} \rightarrow Y = \mathbb{A}_{k}^{1}$ sending $x$ to $x^{p}$.
+    Then for all $\alpha\in \mathbb{A}_{k}^{1}$, $f^{-1}(\alpha) = \alpha^{\frac{1}{p}}$ is a unique point while $[K(X) : K(Y)] = p$.
+\end{example}
 \begin{lemma}
     Let $X, Y$ be irreducible varieties, $f: X \rightarrow Y$ a dominant morphism.
     Assume that $U$ is an affine open dense subset of $Y$ and $V \subseteq f^{-1}(U)$ is an affine open dense subset of $X$.
@@ -1173,11 +1176,7 @@ From now on, by a morphism of varieties, we mean a regular map.
     Hence a general fiber of $f\big{|}_{V}$ is finite if and only if $K(U) = K(Y)$ is finite over $K(V) = K(X)$.
     Then by Lemma \ref{Lemma 4.1}, done!
 \end{proof}
-\begin{example}
-    For the case that $\characteristic k = p$,
-    take morphism $f: X = \mathbb{A}_{k}^{1} \rightarrow Y = \mathbb{A}_{k}^{1}$ sending $x$ to $x^{p}$.
-    Then for all $\alpha\in \mathbb{A}_{k}^{1}$, $f^{-1}(\alpha) = \alpha^{\frac{1}{p}}$ is a unique point while $[K(X) : K(Y)] = p$.
-\end{example}
+
 \begin{corollary}
     Let $X$ be an irreducible variety of dimension $n$.
     Then there exists a dominant morphism $f: X \rightarrow \mathbb{P}_{k}^{n}$ with all fibers finite.
