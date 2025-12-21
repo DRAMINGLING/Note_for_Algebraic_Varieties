@@ -1578,14 +1578,18 @@ From now on, by a morphism of varieties, we mean a regular map.
     Then $\varphi$ is quasi-finite but not finite since $k[t] \rightarrow k[t, \frac{1}{t}]$ is not finite homomorphism.
 \end{example}
 \begin{proof}
-    Since $X$ is projective, replacing $X$ by graph, we get 
-    $
-    \begin{tikzcd}
-        X \arrow[r, hookrightarrow] \arrow[dr, "\varphi" swap] &
-        Y \times \mathbb{P}_{k}^{N} \arrow[d, "p"] \\
-        & Y
-    \end{tikzcd}
-    $
+    Since $X$ is projective, we can embed it into some projective space $\mathbb{P}_{k}^{N}$ as a closed subset.
+    Consider the following commutative diagram
+    \begin{equation}
+        \begin{tikzcd}
+            \Gamma_{\varphi} \arrow[r, hookrightarrow] \arrow[d, "\sim"] & 
+            Y \times X \arrow[r, hookrightarrow] &
+            Y \times \mathbb{P}_{k}^{N} \arrow[d, "p"] \\
+            X \arrow[rr, "\varphi"] && 
+            Y
+        \end{tikzcd}
+    \end{equation}
+    Replace $X$ by graph which is a closed subvariety of $Y \times \mathbb{P}_{k}^{N}$.
     For all $y_{0}\in Y$, $\varphi^{-1}(y_{0})$ is a finite set.
     Hence we can choose a hyperplane $H$ such that $X \cap (\{y_{0}\} \times H) = \varnothing$.
     Note that $p$ is closed map, $p((Y \times H) \cap X)$ is a closed subset of $Y$ not containing $y_{0}$.
