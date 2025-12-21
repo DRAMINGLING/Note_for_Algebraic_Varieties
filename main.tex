@@ -2676,6 +2676,15 @@ for all rational function $f$, we can define a Weil divisor $\divisor (f) = \sum
     (2)Let $\mathbb{P}_{k}^{n}$ be projective space.
     Then $\divisor (\frac{x_{i}}{x_{j}}) = V(x_{i}) - V(x_{j})$. 
 \end{example}
+\begin{corollary}
+    Let $X$ be an irreducible variety.
+    Then for all rational function $f\in K(X)^{\ast}$ such that $\divisor (f) = nV$ with $n > 0$,
+    we have that $f$ is a regular function and $V(f) = V$.
+    \label{Corollary 7.1} 
+\end{corollary}
+\begin{reason}
+    Immediately comes from proof of Lemma \ref{Lemma 7.4}.
+\end{reason}
 
 \subsection{Cartier divisors}
 \label{subsection:Divisors_Cartier_divisors}
@@ -2838,7 +2847,7 @@ Set $\deg D = \sum_{i} n_{i}$.
 \end{reason}
 \begin{corollary}
     There is a well defined map $\deg: \picardscheme (X) \rightarrow \mathbb{Z}$ sending $\mathcal{O}_{X}(D)$ to $\deg D$.
-    \label{Corollary 7.1}
+    \label{Corollary 7.2}
 \end{corollary}
 We call kernel of the $\deg$ map the Jacobian variety of $X$, denoted by $J(X)$.
 \begin{proposition}
