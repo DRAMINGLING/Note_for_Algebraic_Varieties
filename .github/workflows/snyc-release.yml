@@ -20,8 +20,8 @@ jobs:
         run: |
           sudo apt-get update
           sudo apt-get install -y jq
-          # 检查系统参数长度限制（可选）
-          echo "系统参数长度限制：$(getconf ARG_MAX) 字节"
+          # 临时关闭参数长度限制（部分系统有效，辅助措施）
+          ulimit -s unlimited || true
 
       - name: 2. 获取目标Release的PDF文件信息
         id: get_release_asset
@@ -54,68 +54,70 @@ jobs:
       - name: 3. 下载PDF文件并检测大小
         id: download_file
         run: |
-          # 下载文件
-          curl -s -L ${{ steps.get_release_asset.outputs.ASSET_URL }} -o main.pdf
+          # 下载文件（使用--limit-rate避免带宽超限）
+          curl -s -L --limit-rate 5M ${{ steps.get_release_asset.outputs.ASSET_URL }} -o main.pdf
           
           # 检测文件大小（单位：MB）
           FILE_SIZE=$(du -m main.pdf | awk '{print $1}')
           echo "📄 下载的PDF文件大小：$FILE_SIZE MB"
           
-          # 限制最大文件大小（GitHub API单次上传限制100MB，留余量设95MB）
-          MAX_SIZE=95
+          # GitHub API 单次上传最大支持100MB（Base64后会膨胀~37%，所以限制原文件70MB）
+          MAX_SIZE=70
           if [ $FILE_SIZE -gt $MAX_SIZE ]; then
-            echo "❌ 错误：文件大小（$FILE_SIZE MB）超过限制（$MAX_SIZE MB），无法单次上传"
+            echo "❌ 错误：文件大小（$FILE_SIZE MB）超过限制（$MAX_SIZE MB），Base64后会超出API上限"
             exit 1
           fi
-          
-          echo "FILE_SIZE=$FILE_SIZE" >> $GITHUB_OUTPUT
 
-      - name: 4. 生成API请求体（文件方式传递超长内容）
-        id: generate_payload
-        env:
-          TARGET_FILENAME: Note for Algebraic Varieties  # 需要修改：目标文件名
+      - name: 4. 生成Base64文件（无命令行参数传递）
         run: |
-          # 1. 将Base64内容写入临时文件（避免命令行参数过长）
+          # 直接写入Base64文件，不通过命令行传递内容
           base64 -w 0 main.pdf > pdf_base64.txt
-          
-          # 2. 构造JSON请求体（从文件读取Base64内容）
-          jq -n \
-            --arg content "$(cat pdf_base64.txt)" \
-            --arg message "Sync PDF from Note_for_Algebraic_Varieties release (size: ${{ steps.download_file.outputs.FILE_SIZE }}MB)" \
-            --arg filename "$TARGET_FILENAME" \
-            '{
-              message: $message,
-              content: $content,
-              branch: "main"  # 需要修改：目标仓库分支
-            }' > payload.json
-          
-          # 验证请求体（可选）
-          echo "✅ 请求体生成完成，大小：$(du -k payload.json | awk '{print $1}') KB"
+          echo "✅ Base64文件生成完成，大小：$(du -k pdf_base64.txt | awk '{print $1}') KB"
 
-      - name: 5. 推送文件到Documents仓库
+      - name: 5. 构造API请求体（完全脱离命令行参数）
+        run: |
+          # 步骤1：创建元数据文件（仅包含非超长字段）
+          cat > metadata.json << EOF
+          {
+            "message": "Sync PDF from Note_for_Algebraic_Varieties release (size: ${{ steps.download_file.outputs.FILE_SIZE }}MB)",
+            "branch": "main"
+          }
+          EOF
+
+          # 步骤2：用jq的--slurpfile读取超长Base64文件，管道传递避免参数问题
+          # 核心：slurpfile读取文件内容，不经过命令行参数
+          jq --slurpfile content pdf_base64.txt \
+            '.content = $content[0]' metadata.json > payload.json
+
+          # 验证payload（仅输出前100字符，避免日志刷屏）
+          echo "✅ 请求体生成完成，前100字符：$(head -c 100 payload.json)..."
+
+      - name: 6. 推送文件到Documents仓库（无参数传递）
         env:
           OWNER: DRAMINGLING          # 需要修改：GitHub用户名
           TARGET_REPO: Documents       # 需要修改：目标仓库名
           TARGET_FILENAME: Note for Algebraic Varieties  # 需要修改：目标文件名
           GITHUB_TOKEN: ${{ secrets.UPDATE_TEX_FILE }}
         run: |
-          # 推送文件（使用文件传递JSON体，避免参数过长）
+          # 对目标文件名做URL编码（避免空格/特殊字符）
+          ENCODED_FILENAME=$(echo -n "$TARGET_FILENAME" | jq -sRr @uri)
+          
+          # 推送文件：用@payload.json传递请求体，无命令行参数传递超长内容
           RESPONSE=$(curl -s -X PUT \
             -H "Authorization: token $GITHUB_TOKEN" \
             -H "Accept: application/vnd.github.v3+json" \
             -d @payload.json \
-            "https://api.github.com/repos/$OWNER/$TARGET_REPO/contents/$(echo -n "$TARGET_FILENAME" | jq -sRr @uri)")
+            "https://api.github.com/repos/$OWNER/$TARGET_REPO/contents/$ENCODED_FILENAME")
 
-          # 检查推送结果
+          # 检查结果
           if echo "$RESPONSE" | jq -e '.commit' > /dev/null; then
-            echo "✅ 文件推送成功！"
-            echo "🔗 Commit: https://github.com/$OWNER/$TARGET_REPO/commit/$(echo "$RESPONSE" | jq -r '.commit.sha')"
+            echo "✅ 文件推送成功！Commit SHA: $(echo "$RESPONSE" | jq -r '.commit.sha')"
           else
-            echo "❌ 文件推送失败：$RESPONSE"
+            echo "❌ 文件推送失败：$(echo "$RESPONSE" | jq -r '.message // .')"
             exit 1
           fi
 
-      - name: 6. 清理临时文件（可选）
+      - name: 7. 清理临时文件
         if: always()
         run: |
-          rm -f main.pdf pdf_base64.txt payload.json
+          rm -f main.pdf pdf_base64.txt metadata.json payload.json
