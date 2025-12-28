@@ -47,8 +47,3 @@ jobs:
           replace_assets: true # 覆盖已存在的资源文件（实现覆盖Release的关键）
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          
-      - name: Run GitHub File Sync
-        uses: BetaHuhn/repo-file-sync-action@v1
-        with:
-          GH_PAT: ${{ secrets.UPDATE_TEX_FILE }}
