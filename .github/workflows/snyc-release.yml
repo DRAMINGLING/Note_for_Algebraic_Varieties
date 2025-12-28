@@ -11,86 +11,56 @@ on:
 jobs:
   push-pdf:
     runs-on: ubuntu-latest
+    permissions:
+      contents: write  # 授予写入仓库内容的权限
     steps:
-      # 步骤1：检出当前仓库（可选，主要用于环境初始化）
-      - name: Checkout current repo
+      - name: 1. 设置环境变量（需修改的核心配置）
+        id: set-env
+        run: |
+          # ========== 需要用户修改的变量 ==========
+          # 源仓库信息（一般无需修改，因为工作流在该仓库运行）
+          echo "SOURCE_OWNER=DRAMINGLING" >> $GITHUB_ENV
+          echo "SOURCE_REPO=Note_for_Algebraic_Varieties" >> $GITHUB_ENV
+          
+          # 目标仓库信息（必须修改为你的Documents仓库信息）
+          echo "TARGET_OWNER=DRAMINGLING" >> $GITHUB_ENV  # 替换为你的GitHub用户名
+          echo "TARGET_REPO=Documents" >> $GITHUB_ENV     # 替换为你的目标仓库名
+          
+          # PDF文件存储路径（可选修改：Documents仓库中存储PDF的目录）
+          echo "PDF_TARGET_DIR=Algebraic_Varieties" >> $GITHUB_ENV  # 目标仓库中的子目录，不存在会自动创建
+          
+          # 提交信息（可选修改）
+          echo "COMMIT_MESSAGE=Update main.pdf from Note_for_Algebraic_Varieties release" >> $GITHUB_ENV
+          # =======================================
+
+      - name: 2. 下载release中的main.pdf文件
+        uses: dsaltares/fetch-gh-release-asset@master
+        with:
+          repo: ${{ env.SOURCE_OWNER }}/${{ env.SOURCE_REPO }}
+          tag: release
+          file: main.pdf
+          target: ./main.pdf
+          token: ${{ secrets.UPDATE_TEX_FILE }}  # 使用指定的secret名称
+
+      - name: 3. 克隆目标Documents仓库
         uses: actions/checkout@v4
+        with:
+          repository: ${{ env.TARGET_OWNER }}/${{ env.TARGET_REPO }}
+          token: ${{ secrets.UPDATE_TEX_FILE }}  # 用于克隆私有仓库（若为公有也需要）
+          path: target-repo  # 克隆到target-repo目录
 
-      # 步骤2：安装必要工具（curl/wget用于下载文件，git用于推送）
-      - name: Install dependencies
-        run: |
-          sudo apt-get update && sudo apt-get install -y curl wget git
-
-      # 步骤3：下载Release中的main.pdf文件
-      - name: Download main.pdf from Release
-        env:
-          # ========== 需要修改的变量1 ==========
-          # 源仓库所有者（固定为DRAMINGLING，可根据实际修改）
-          SOURCE_REPO_OWNER: "DRAMINGLING"
-          # 源仓库名称（固定为Note_for_Algebraic_Varieties，可根据实际修改）
-          SOURCE_REPO_NAME: "Note_for_Algebraic_Varieties"
-          # Release标签名（若需固定标签，可改为具体值如v1.0，否则用github.ref_name自动获取）
-          RELEASE_TAG: ${{ github.ref_name }}
-        run: |
-          # 构造Release文件下载URL
-          DOWNLOAD_URL="https://github.com/${SOURCE_REPO_OWNER}/${SOURCE_REPO_NAME}/releases/download/${release}/main.pdf"
-          # 下载文件到本地，命名为main.pdf
-          wget --no-check-certificate $DOWNLOAD_URL -O main.pdf
-          # 验证文件是否下载成功
-          if [ ! -f "main.pdf" ]; then
-            echo "Error: main.pdf not found in Release ${release}"
-            exit 1
-          fi
-
-      # 步骤4：克隆目标仓库Documents
-      - name: Clone Documents repository
-        env:
-          # ========== 需要修改的变量2 ==========
-          # 目标仓库所有者（固定为DRAMINGLING，可根据实际修改）
-          TARGET_REPO_OWNER: "DRAMINGLING"
-          # 目标仓库名称（固定为Documents，可根据实际修改）
-          TARGET_REPO_NAME: "Documents"
-          # ========== Secret配置 ==========
-          # UPDATE_TEX_FILE：GitHub Personal Access Token (PAT)，需具备repo权限
-          PAT: ${{ secrets.UPDATE_TEX_FILE }}
-        run: |
-          # 克隆目标仓库（使用PAT避免权限问题）
-          git clone https://${PAT}@github.com/${TARGET_REPO_OWNER}/${TARGET_REPO_NAME}.git target-repo
-          # 进入目标仓库目录
-          cd target-repo
-
-      # 步骤5：复制PDF文件到目标仓库并提交推送
-      - name: Copy PDF and push to Documents
-        env:
-          # ========== 需要修改的变量3 ==========
-          # PDF在目标仓库中的存储路径（可自定义，如math/algebraic_varieties/）
-          TARGET_PDF_PATH: "math/algebraic_varieties/"
-          # 提交者信息（可自定义）
-          COMMIT_AUTHOR_NAME: "GitHub Actions"
-          COMMIT_AUTHOR_EMAIL: "actions@github.com"
-          # ========== 固定变量（无需修改） ==========
-          TARGET_REPO_OWNER: "DRAMINGLING"
-          TARGET_REPO_NAME: "Documents"
-          PAT: ${{ secrets.UPDATE_TEX_FILE }}
+      - name: 4. 准备目标目录并复制PDF文件
         run: |
           # 创建目标目录（若不存在）
-          mkdir -p target-repo/${TARGET_PDF_PATH}
+          mkdir -p ./target-repo/${{ env.PDF_TARGET_DIR }}
           # 复制下载的PDF到目标目录
-          cp main.pdf target-repo/${TARGET_PDF_PATH}/main.pdf
-          # 进入目标仓库目录
-          cd target-repo
-          # 配置git提交者信息
-          git config --global user.name "${COMMIT_AUTHOR_NAME}"
-          git config --global user.email "${COMMIT_AUTHOR_EMAIL}"
-          # 检查是否有文件变更
-          if git status | grep -q "modified:\|new file:"; then
-            # 添加文件到暂存区
-            git add ${TARGET_PDF_PATH}/main.pdf
-            # 提交变更
-            git commit -m "Update main.pdf from Note_for_Algebraic_Varieties Release: ${RELEASE_TAG}"
-            # 推送变更到目标仓库
-            git push https://${PAT}@github.com/${TARGET_REPO_OWNER}/${TARGET_REPO_NAME}.git main
-            echo "Successfully pushed main.pdf to Documents repository"
-          else
-            echo "No changes to push (main.pdf is already up-to-date)"
-          fi
+          cp ./main.pdf ./target-repo/${{ env.PDF_TARGET_DIR }}/main.pdf
+
+      - name: 5. 提交并推送文件到Documents仓库
+        uses: stefanzweifel/git-auto-commit-action@v5
+        with:
+          repository: ./target-repo  # 指定仓库目录
+          commit_message: ${{ env.COMMIT_MESSAGE }}
+          file_pattern: ${{ env.PDF_TARGET_DIR }}/main.pdf  # 仅提交该文件
+          push_options: --force-with-lease  # 安全推送（避免覆盖未同步的更改）
+          branch: main  # 目标仓库的主分支（若为master需修改）
