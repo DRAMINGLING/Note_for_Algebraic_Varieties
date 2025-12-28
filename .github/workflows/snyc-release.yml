@@ -1,123 +1,120 @@
 name: Sync Release PDF to Documents Repository
 
+# 触发方式：手动按钮触发（workflow_dispatch）
 on:
   workflow_dispatch:
+    # 可选：添加手动触发时的参数（非必须，简化版可省略）
     inputs:
       release_tag:
-        description: 'Release标签（留空则使用最新release）'
-        required: false
-        default: ''
-
-permissions:
-  contents: write
-  packages: read
+        description: '源仓库的Release标签（默认：release）'
+        required: true
+        default: 'release'
+      source_pdf_name:
+        description: '源Release中的PDF文件名（默认：main.pdf）'
+        required: true
+        default: 'main.pdf'
+      target_pdf_name:
+        description: '目标仓库的PDF重命名（默认：Note for Algebraic Varieties）'
+        required: true
+        default: 'Note for Algebraic Varieties'
 
 jobs:
-  sync-pdf-file:
+  sync-pdf:
     runs-on: ubuntu-latest
     steps:
-      - name: 1. 环境准备（安装必要工具）
+      # 步骤1：安装依赖（jq用于解析JSON，curl用于调用API）
+      - name: Install required tools
         run: |
-          sudo apt-get update
-          sudo apt-get install -y jq
-          # 临时关闭参数长度限制（部分系统有效，辅助措施）
-          ulimit -s unlimited || true
+          sudo apt-get update && sudo apt-get install -y curl jq
 
-      - name: 2. 获取目标Release的PDF文件信息
-        id: get_release_asset
+      # 步骤2：获取源Release中PDF文件的Asset ID
+      - name: Get Asset ID of Source PDF
+        id: get_asset
         env:
-          OWNER: DRAMINGLING          # 需要修改：GitHub用户名
-          SOURCE_REPO: Note_for_Algebraic_Varieties  # 需要修改：源仓库名
-          ASSET_NAME: main.pdf        # 需要修改：源Release中的文件名
+          # 核心Secret：用于认证GitHub API
           GITHUB_TOKEN: ${{ secrets.UPDATE_TEX_FILE }}
+          # 需修改的变量1：源仓库名（用户的Note_for_Algebraic_Varieties）
+          SOURCE_REPO: "Note_for_Algebraic_Varieties"
+          # 源仓库所有者（自动获取当前触发用户，无需修改）
+          REPO_OWNER: ${{ github.repository_owner }}
         run: |
-          # 获取Release信息
-          if [ -z "${{ github.event.inputs.release_tag }}" ]; then
-            RELEASE_INFO=$(curl -s -H "Authorization: token $GITHUB_TOKEN" \
-              "https://api.github.com/repos/$OWNER/$SOURCE_REPO/releases/latest")
+          # 调用GitHub API获取指定标签的Release信息
+          ASSET_ID=$(curl -s -H "Authorization: token $GITHUB_TOKEN" \
+            "https://api.github.com/repos/$REPO_OWNER/$SOURCE_REPO/releases/tags/${{ github.event.inputs.release_tag }}" \
+            | jq -r --arg fname "${{ github.event.inputs.source_pdf_name }}" \
+            '.assets[] | select(.name == $fname) | .id')
+          
+          # 校验Asset ID是否存在
+          if [ -z "$ASSET_ID" ] || [ "$ASSET_ID" = "null" ]; then
+            echo "❌ 错误：在Release标签『${{ github.event.inputs.release_tag }}』中未找到文件『${{ github.event.inputs.source_pdf_name }}』"
+            exit 1
+          fi
+          echo "asset_id=$ASSET_ID" >> $GITHUB_OUTPUT
+          echo "✅ 找到源PDF的Asset ID：$ASSET_ID"
+
+      # 步骤3：下载源Release中的PDF文件
+      - name: Download PDF from Source Release
+        env:
+          GITHUB_TOKEN: ${{ secrets.UPDATE_TEX_FILE }}
+          SOURCE_REPO: "Note_for_Algebraic_Varieties"
+          REPO_OWNER: ${{ github.repository_owner }}
+        run: |
+          # 下载PDF文件（指定Accept头为二进制流）
+          curl -s -L -o temp.pdf \
+            -H "Authorization: token $GITHUB_TOKEN" \
+            -H "Accept: application/octet-stream" \
+            "https://api.github.com/repos/$REPO_OWNER/$SOURCE_REPO/releases/assets/${{ steps.get_asset.outputs.asset_id }}"
+          
+          # 校验文件是否下载成功
+          if [ ! -f "temp.pdf" ] || [ $(stat -c%s "temp.pdf") -eq 0 ]; then
+            echo "❌ 错误：源PDF文件下载失败"
+            exit 1
+          fi
+          echo "✅ 源PDF文件下载成功"
+
+      # 步骤4：上传PDF到目标仓库（Documents）并改名
+      - name: Upload PDF to Target Repository
+        env:
+          GITHUB_TOKEN: ${{ secrets.UPDATE_TEX_FILE }}
+          # 需修改的变量2：目标仓库名（用户的Documents）
+          TARGET_REPO: "Documents"
+          REPO_OWNER: ${{ github.repository_owner }}
+        run: |
+          # 目标文件名（补PDF后缀，URL编码用于API请求）
+          TARGET_FILENAME="${{ github.event.inputs.target_pdf_name }}.pdf"
+          TARGET_FILENAME_ENCODED=$(echo -n "$TARGET_FILENAME" | jq -sRr @uri)
+          
+          # 读取PDF文件为Base64编码（GitHub API要求）
+          CONTENT=$(base64 -w 0 temp.pdf)
+          
+          # 先检查目标文件是否存在，获取SHA（用于覆盖已有文件）
+          SHA_RESPONSE=$(curl -s -H "Authorization: token $GITHUB_TOKEN" \
+            "https://api.github.com/repos/$REPO_OWNER/$TARGET_REPO/contents/$TARGET_FILENAME_ENCODED")
+          SHA=$(echo "$SHA_RESPONSE" | jq -r '.sha')
+          if [ "$SHA" = "null" ]; then SHA=""; fi
+          
+          # 构造API请求数据（存在SHA则覆盖，不存在则新建）
+          if [ -z "$SHA" ]; then
+            REQUEST_DATA=$(jq -n --arg msg "Sync PDF: $TARGET_FILENAME from release ${{ github.event.inputs.release_tag }}" \
+              --arg content "$CONTENT" \
+              '{"message": $msg, "content": $content}')
           else
-            RELEASE_INFO=$(curl -s -H "Authorization: token $GITHUB_TOKEN" \
-              "https://api.github.com/repos/$OWNER/$SOURCE_REPO/releases/tags/${{ github.event.inputs.release_tag }}")
+            REQUEST_DATA=$(jq -n --arg msg "Update PDF: $TARGET_FILENAME from release ${{ github.event.inputs.release_tag }}" \
+              --arg content "$CONTENT" \
+              --arg sha "$SHA" \
+              '{"message": $msg, "content": $content, "sha": $sha}')
           fi
-
-          # 提取PDF下载URL
-          ASSET_URL=$(echo "$RELEASE_INFO" | jq -r --arg name "$ASSET_NAME" \
-            '.assets[] | select(.name == $name) | .browser_download_url')
-
-          if [ "$ASSET_URL" = "null" ] || [ -z "$ASSET_URL" ]; then
-            echo "❌ 错误：未在Release中找到名为 $ASSET_NAME 的文件"
-            exit 1
-          fi
-
-          echo "ASSET_URL=$ASSET_URL" >> $GITHUB_OUTPUT
-
-      - name: 3. 下载PDF文件并检测大小
-        id: download_file
-        run: |
-          # 下载文件（使用--limit-rate避免带宽超限）
-          curl -s -L --limit-rate 5M ${{ steps.get_release_asset.outputs.ASSET_URL }} -o main.pdf
           
-          # 检测文件大小（单位：MB）
-          FILE_SIZE=$(du -m main.pdf | awk '{print $1}')
-          echo "📄 下载的PDF文件大小：$FILE_SIZE MB"
-          
-          # GitHub API 单次上传最大支持100MB（Base64后会膨胀~37%，所以限制原文件70MB）
-          MAX_SIZE=70
-          if [ $FILE_SIZE -gt $MAX_SIZE ]; then
-            echo "❌ 错误：文件大小（$FILE_SIZE MB）超过限制（$MAX_SIZE MB），Base64后会超出API上限"
-            exit 1
-          fi
-
-      - name: 4. 生成Base64文件（无命令行参数传递）
-        run: |
-          # 直接写入Base64文件，不通过命令行传递内容
-          base64 -w 0 main.pdf > pdf_base64.txt
-          echo "✅ Base64文件生成完成，大小：$(du -k pdf_base64.txt | awk '{print $1}') KB"
-
-      - name: 5. 构造API请求体（完全脱离命令行参数）
-        run: |
-          # 步骤1：创建元数据文件（仅包含非超长字段）
-          cat > metadata.json << EOF
-          {
-            "message": "Sync PDF from Note_for_Algebraic_Varieties release (size: ${{ steps.download_file.outputs.FILE_SIZE }}MB)",
-            "branch": "main"
-          }
-          EOF
-
-          # 步骤2：用jq的--slurpfile读取超长Base64文件，管道传递避免参数问题
-          # 核心：slurpfile读取文件内容，不经过命令行参数
-          jq --slurpfile content pdf_base64.txt \
-            '.content = $content[0]' metadata.json > payload.json
-
-          # 验证payload（仅输出前100字符，避免日志刷屏）
-          echo "✅ 请求体生成完成，前100字符：$(head -c 100 payload.json)..."
-
-      - name: 6. 推送文件到Documents仓库（无参数传递）
-        env:
-          OWNER: DRAMINGLING          # 需要修改：GitHub用户名
-          TARGET_REPO: Documents       # 需要修改：目标仓库名
-          TARGET_FILENAME: Note for Algebraic Varieties  # 需要修改：目标文件名
-          GITHUB_TOKEN: ${{ secrets.UPDATE_TEX_FILE }}
-        run: |
-          # 对目标文件名做URL编码（避免空格/特殊字符）
-          ENCODED_FILENAME=$(echo -n "$TARGET_FILENAME" | jq -sRr @uri)
-          
-          # 推送文件：用@payload.json传递请求体，无命令行参数传递超长内容
-          RESPONSE=$(curl -s -X PUT \
+          # 调用API上传文件到目标仓库根目录
+          UPLOAD_RESPONSE=$(curl -s -X PUT \
             -H "Authorization: token $GITHUB_TOKEN" \
             -H "Accept: application/vnd.github.v3+json" \
-            -d @payload.json \
-            "https://api.github.com/repos/$OWNER/$TARGET_REPO/contents/$ENCODED_FILENAME")
-
-          # 检查结果
-          if echo "$RESPONSE" | jq -e '.commit' > /dev/null; then
-            echo "✅ 文件推送成功！Commit SHA: $(echo "$RESPONSE" | jq -r '.commit.sha')"
-          else
-            echo "❌ 文件推送失败：$(echo "$RESPONSE" | jq -r '.message // .')"
+            "https://api.github.com/repos/$REPO_OWNER/$TARGET_REPO/contents/$TARGET_FILENAME_ENCODED" \
+            -d "$REQUEST_DATA")
+          
+          # 校验上传结果
+          if echo "$UPLOAD_RESPONSE" | jq -e '.message' > /dev/null; then
+            echo "❌ 上传失败：$(echo "$UPLOAD_RESPONSE" | jq -r '.message')"
             exit 1
           fi
-
-      - name: 7. 清理临时文件
-        if: always()
-        run: |
-          rm -f main.pdf pdf_base64.txt metadata.json payload.json
+          echo "✅ 成功！PDF已上传到 $REPO_OWNER/$TARGET_REPO 根目录，文件名：$TARGET_FILENAME"
