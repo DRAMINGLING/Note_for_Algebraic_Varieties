@@ -51,8 +51,8 @@ jobs:
       - name: Sync PDF to Documents
         uses: Yikun/hub-mirror-action@master
         with:
-          src: ${{ github.repository }} # 源仓库（当前仓库）
-          dst: DRAMINGLING/Documents # 目标仓库
+          src: github/${{ github.repository }} # 源仓库（当前仓库）
+          dst: github/DRAMINGLING/Documents # 目标仓库
           dst_token: ${{ secrets.UPDATE_TEX_FILE }} # 目标仓库的PAT
           static_list: "Note for algebraic varieties.pdf" # 要同步的特定文件路径
           force_update: true
