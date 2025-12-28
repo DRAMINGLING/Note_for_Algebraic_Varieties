@@ -1,11 +1,6 @@
 name: Sync Release File
 
 on:
-  # 当 release 被覆盖更新时触发（包括编辑、重新发布等）
-  release:
-    types: [edited, released]
-    tags: [release]  # 只监听名为 "release" 的标签
-    
   workflow_dispatch:  # 手动触发按钮
     inputs:
       source_tag:
@@ -17,9 +12,10 @@ on:
         required: true
         default: 'Note for Algebraic Varieties'
 
-  schedule:
-    # 每天UTC时间0点运行（北京时间8点）
-    - cron: '0 0 * * *'
+  workflow_run:
+    workflows: ["Build LaTeX and Release PDF"]
+    types:
+      - completed
     
 # 设置权限，允许写入目标仓库
 permissions:
