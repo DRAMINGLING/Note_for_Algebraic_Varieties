@@ -1,8 +1,8 @@
 name: Sync Release File
 
 on:
-  release:
-    types: [released]  # 当有新的 Release 发布时触发
+  repository_dispatch:
+    types: [sync_release]
     
   workflow_dispatch:  # 手动触发按钮
     inputs:
