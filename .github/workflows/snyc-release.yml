@@ -12,63 +12,85 @@ jobs:
   push-pdf:
     runs-on: ubuntu-latest
     steps:
-      # ==================== 步骤1：拉取源仓库代码（获取Release上下文） ====================
-      - name: 检出源仓库代码
+      # 步骤1：检出当前仓库（可选，主要用于环境初始化）
+      - name: Checkout current repo
         uses: actions/checkout@v4
 
-      # 步骤2：下载Release中的main.pdf资产（修正核心步骤）
-      - name: 下载Release中的main.pdf资产
-        uses: dassiorleando/gh-download-release-asset@v1
-        with:
-          # 【需修改】源仓库所有者/仓库名（例：DRAMINGLING/Note_for_Algebraic_Varieties）
-          repo: DRAMINGLING/Note_for_Algebraic_Varieties
-          # 【需修改】Release标签（静态值或动态值，例：v1.0.0 或 ${{ github.event.release.tag_name }}）
-          tag: ${{ github.event.release.tag_name || 'release' }}
-          # 要下载的资产文件名（精准匹配）
-          file: main.pdf
-          # 下载到临时目录
-          dest: ./tmp-pdf
-          # 鉴权Token（源仓库的只读Token，可选，公开仓库可省略）
-          token: ${{ github.token }}
-
-      # ==================== 步骤3：检出目标Documents仓库 ====================
-      - name: 检出目标Documents仓库
-        uses: actions/checkout@v4
-        with:
-          # 【需修改】目标仓库的HTTPS地址（例：https://github.com/octocat/Documents.git）
-          repository: DRAMINGLING/Documents
-          # 【需修改】目标仓库的分支（例：main/master）
-          ref: main
-          # 目标仓库的本地检出目录
-          path: ./target-repo
-          # 【核心】用于推送的Token（需提前在GitHub设置Personal Access Token，权限含repo）
-          token: ${{ secrets.UPDATE_TEX_FILE }}
-
-      # ==================== 步骤4：复制PDF到目标仓库并推送 ====================
-      - name: 复制PDF到目标仓库
+      # 步骤2：安装必要工具（curl/wget用于下载文件，git用于推送）
+      - name: Install dependencies
         run: |
-          # 确保目标仓库目录存在（可选：指定子目录，如docs/pdf）
-          mkdir -p ./target-repo
-          # 复制下载的main.pdf到目标仓库（可修改目标文件名，如main-v1.0.0.pdf）
-          cp ./tmp-pdf/main.pdf ./target-repo/Note for Algebraic Varieties.pdf
-          # 进入目标仓库目录
-          cd ./target-repo
-          # 配置Git用户（Action默认无配置）
-          git config --global user.name "GitHub Actions"
-          git config --global user.email "actions@github.com"
-          # 检查变更
-          git add .
-          git commit -m "chore: 同步源仓库Release的main.pdf（标签：${{ github.event.release.tag_name || 'release' }}）" || echo "无文件变更，无需提交"
+          sudo apt-get update && sudo apt-get install -y curl wget git
 
-      # ==================== 步骤5：推送到目标仓库（使用Action封装，避免原生Git） ====================
-      - name: 推送到Documents仓库
-        uses: ad-m/github-push-action@master
-        with:
-          # 目标仓库的本地路径
-          directory: ./target-repo
-          # 【需修改】目标仓库分支（与步骤3的ref一致）
-          branch: main
-          # 强制推送（可选，谨慎使用）
-          force: true
-          # 使用指定Token推送
-          github_token: ${{ secrets.UPDATE_TEX_FILE }}
+      # 步骤3：下载Release中的main.pdf文件
+      - name: Download main.pdf from Release
+        env:
+          # ========== 需要修改的变量1 ==========
+          # 源仓库所有者（固定为DRAMINGLING，可根据实际修改）
+          SOURCE_REPO_OWNER: "DRAMINGLING"
+          # 源仓库名称（固定为Note_for_Algebraic_Varieties，可根据实际修改）
+          SOURCE_REPO_NAME: "Note_for_Algebraic_Varieties"
+          # Release标签名（若需固定标签，可改为具体值如v1.0，否则用github.ref_name自动获取）
+          RELEASE_TAG: ${{ github.ref_name }}
+        run: |
+          # 构造Release文件下载URL
+          DOWNLOAD_URL="https://github.com/${SOURCE_REPO_OWNER}/${SOURCE_REPO_NAME}/releases/download/${RELEASE_TAG}/main.pdf"
+          # 下载文件到本地，命名为main.pdf
+          wget --no-check-certificate $DOWNLOAD_URL -O main.pdf
+          # 验证文件是否下载成功
+          if [ ! -f "main.pdf" ]; then
+            echo "Error: main.pdf not found in Release ${RELEASE_TAG}"
+            exit 1
+          fi
+
+      # 步骤4：克隆目标仓库Documents
+      - name: Clone Documents repository
+        env:
+          # ========== 需要修改的变量2 ==========
+          # 目标仓库所有者（固定为DRAMINGLING，可根据实际修改）
+          TARGET_REPO_OWNER: "DRAMINGLING"
+          # 目标仓库名称（固定为Documents，可根据实际修改）
+          TARGET_REPO_NAME: "Documents"
+          # ========== Secret配置 ==========
+          # UPDATE_TEX_FILE：GitHub Personal Access Token (PAT)，需具备repo权限
+          PAT: ${{ secrets.UPDATE_TEX_FILE }}
+        run: |
+          # 克隆目标仓库（使用PAT避免权限问题）
+          git clone https://${PAT}@github.com/${TARGET_REPO_OWNER}/${TARGET_REPO_NAME}.git target-repo
+          # 进入目标仓库目录
+          cd target-repo
+
+      # 步骤5：复制PDF文件到目标仓库并提交推送
+      - name: Copy PDF and push to Documents
+        env:
+          # ========== 需要修改的变量3 ==========
+          # PDF在目标仓库中的存储路径（可自定义，如math/algebraic_varieties/）
+          TARGET_PDF_PATH: "math/algebraic_varieties/"
+          # 提交者信息（可自定义）
+          COMMIT_AUTHOR_NAME: "GitHub Actions"
+          COMMIT_AUTHOR_EMAIL: "actions@github.com"
+          # ========== 固定变量（无需修改） ==========
+          TARGET_REPO_OWNER: "DRAMINGLING"
+          TARGET_REPO_NAME: "Documents"
+          PAT: ${{ secrets.UPDATE_TEX_FILE }}
+        run: |
+          # 创建目标目录（若不存在）
+          mkdir -p target-repo/${TARGET_PDF_PATH}
+          # 复制下载的PDF到目标目录
+          cp main.pdf target-repo/${TARGET_PDF_PATH}/main.pdf
+          # 进入目标仓库目录
+          cd target-repo
+          # 配置git提交者信息
+          git config --global user.name "${COMMIT_AUTHOR_NAME}"
+          git config --global user.email "${COMMIT_AUTHOR_EMAIL}"
+          # 检查是否有文件变更
+          if git status | grep -q "modified:\|new file:"; then
+            # 添加文件到暂存区
+            git add ${TARGET_PDF_PATH}/main.pdf
+            # 提交变更
+            git commit -m "Update main.pdf from Note_for_Algebraic_Varieties Release: ${RELEASE_TAG}"
+            # 推送变更到目标仓库
+            git push https://${PAT}@github.com/${TARGET_REPO_OWNER}/${TARGET_REPO_NAME}.git main
+            echo "Successfully pushed main.pdf to Documents repository"
+          else
+            echo "No changes to push (main.pdf is already up-to-date)"
+          fi
