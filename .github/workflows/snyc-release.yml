@@ -1,0 +1,24 @@
+name: Sync Releases
+
+on:
+  workflow_dispatch:  # 手动触发
+  release:
+    types: [published]  # 源仓库发布时触发
+
+jobs:
+  push-pdf:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Push to Documents
+        uses: cpina/github-action-push-to-another-repository@v1
+        env:
+          # 需要设置的密钥
+          API_TOKEN_GITHUB: ${{ secrets.UPDATE_TEX_FILE }}
+        with:
+          # 需要修改的目标仓库信息
+          target-repository: DRAMINGLING/Documents
+          target-branch: main
+          source-directory: '.'
+          destination-directory: 'releases'
+          # 只推送PDF文件
+          file-filter: '*.pdf'
