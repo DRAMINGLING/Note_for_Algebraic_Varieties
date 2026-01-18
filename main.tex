@@ -2643,19 +2643,19 @@ With discussion above, we successfully give a group structure on $\picardscheme(
     Conclude that $s$ is zero section.
 \end{remark}
 \begin{proposition}
-    Let $L = (\{U_{k}\}, g_{kl})$ be a line bundle over $X$.
-    Assume $s_{0}, \cdots, s_{n}\in \Gamma(X, L)$, where $s_{i} = \{s_{ik}\}$
-    Define a rational map $\phi_{L}: X \dashrightarrow \mathbb{P}_{k}^{n}$ by gluing up $U_{k} \dashrightarrow \mathbb{P}_{k}^{n}$ sending $x$ to $[s_{0k}(x), \cdots, s_{nk}(x)]$.
-    If for all $x\in X$, $s_{ik}(x) \neq 0$ for some $i, k$,
+    Let $L = (\{U_{r}\}, g_{rl})$ be a line bundle over $X$.
+    Assume $s_{0}, \cdots, s_{n}\in \Gamma(X, L)$, where $s_{i} = \{s_{ir}\}$
+    Define a rational map $\phi_{L}: X \dashrightarrow \mathbb{P}_{k}^{n}$ by gluing up $U_{r} \dashrightarrow \mathbb{P}_{k}^{n}$ sending $x$ to $[s_{0r}(x), \cdots, s_{nr}(x)]$.
+    If for all $x\in X$, $s_{ir}(x) \neq 0$ for some $i, r$,
     then $\phi_{L}$ is a well defined morphism.
     And in this case, $L = \phi_{L}^{\ast}\mathcal{O}_{\mathbb{P}_{k}^{1}}(1)$.
     \label{Proposition 7.2}
 \end{proposition}
 \begin{proof}
-    Clearly, $\phi_{L}$ is a morphism, want to show that $(\{\phi_{L}^{-1}(D_{+}(x_{i}))\}, \frac{x_{j}}{x_{i}} \circ \phi_{L}) \sim (\{U_{k}\}, g_{kl})$.
-    In fact, for all $x\in U_{k} \cap \phi_{L}^{-1}(D_{+}(x_{i}))$, by definition, $s_{ik}(x) \neq 0$.
-    Hence $s_{ik}$ is an invertible regular function on $U_{k} \cap \phi_{L}^{-1}(D_{+}(x_{i}))$.
-    And $g_{kl}s_{jl} = s_{jk} = \frac{s_{jk}}{s_{ik}} \cdot s_{ik} = (\frac{x_{j}}{x_{i}} \circ \phi_{L}) \circ s_{ik}$, done!
+    Clearly, $\phi_{L}$ is a morphism, want to show that $(\{\phi_{L}^{-1}(D_{+}(x_{i}))\}, \frac{x_{j}}{x_{i}} \circ \phi_{L}) \sim (\{U_{r}\}, g_{rl})$.
+    In fact, for all $x\in U_{r} \cap \phi_{L}^{-1}(D_{+}(x_{i}))$, by definition, $s_{ir}(x) \neq 0$.
+    Hence $s_{ir}$ is an invertible regular function on $U_{r} \cap \phi_{L}^{-1}(D_{+}(x_{i}))$.
+    And $g_{rl}s_{jl} = s_{jr} = \frac{s_{jr}}{s_{ir}} \cdot s_{ir} = (\frac{x_{j}}{x_{i}} \circ \phi_{L}) \circ s_{ir}$, done!
 \end{proof}
 \begin{example}
     Recall that for projective spaces, we have Veronese map and Segre embedding.
