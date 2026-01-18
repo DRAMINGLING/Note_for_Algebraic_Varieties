@@ -2645,22 +2645,22 @@ With discussion above, we successfully give a group structure on $\picardscheme(
 \begin{proposition}
     Let $L = (\{U_{k}\}, g_{kl})$ be a line bundle over $X$.
     Assume $s_{0}, \cdots, s_{n}\in \Gamma(X, L)$, where $s_{i} = \{s_{ik}\}$
-    Define a rational map $\phi_{L}: X \dashrightarrow \mathbb{P}_{k}^{n}$ glued up by $U_{k} \dashrightarrow \mathbb{P}_{k}^{n}$ sending $x$ to $[s_{0k}(x), \cdots, s_{nk}(x)]$.
+    Define a rational map $\phi_{L}: X \dashrightarrow \mathbb{P}_{k}^{n}$ by gluing up $U_{k} \dashrightarrow \mathbb{P}_{k}^{n}$ sending $x$ to $[s_{0k}(x), \cdots, s_{nk}(x)]$.
     If for all $x\in X$, $s_{ik}(x) \neq 0$ for some $i, k$,
     then $\phi_{L}$ is a well defined morphism.
     And in this case, $L = \phi_{L}^{\ast}\mathcal{O}_{\mathbb{P}_{k}^{1}}(1)$.
     \label{Proposition 7.2}
 \end{proposition}
 \begin{proof}
-    Clearly, $\varphi_{L}$ is a morphism, want to show that $(\{\varphi_{L}^{-1}(D_{+}(x_{i}))\}, \frac{x_{j}}{x_{i}} \circ \varphi_{L}) \sim (\{U_{k}\}, g_{kl})$.
-    In fact, for all $x\in U_{k} \cap \varphi_{L}^{-1}(D_{+}(x_{i}))$, by definition, $s_{ik}(x) \neq 0$.
-    Hence $s_{ik}$ is an invertible regular function on $U_{k} \cap \varphi_{L}^{-1}(D_{+}(x_{i}))$.
-    And $g_{kl}s_{jl} = s_{jk} = \frac{s_{jk}}{s_{ik}} \cdot s_{ik} = (\frac{x_{j}}{x_{i}} \circ \varphi_{L}) \circ s_{ik}$, done!
+    Clearly, $\phi_{L}$ is a morphism, want to show that $(\{\phi_{L}^{-1}(D_{+}(x_{i}))\}, \frac{x_{j}}{x_{i}} \circ \phi_{L}) \sim (\{U_{k}\}, g_{kl})$.
+    In fact, for all $x\in U_{k} \cap \phi_{L}^{-1}(D_{+}(x_{i}))$, by definition, $s_{ik}(x) \neq 0$.
+    Hence $s_{ik}$ is an invertible regular function on $U_{k} \cap \phi_{L}^{-1}(D_{+}(x_{i}))$.
+    And $g_{kl}s_{jl} = s_{jk} = \frac{s_{jk}}{s_{ik}} \cdot s_{ik} = (\frac{x_{j}}{x_{i}} \circ \phi_{L}) \circ s_{ik}$, done!
 \end{proof}
 \begin{example}
     Recall that for projective spaces, we have Veronese map and Segre embedding.
     Consider the $d$th Veronese map $v_{d}: \mathbb{P}_{k}^{n} \rightarrow \mathbb{P}_{k}^{\binom{n + d - 1}{d}}$.
-    In fact, $v_{d}$ is given by sections in $\Gamma(\mathbb{P}_{k}^{n}, \mathcal{O}_{\mathbb{P}_{k}^{n}}(d))$ that are monomial of degree $d$ with coeffcient $1$.
+    In fact, $v_{d}$ is given by sections in $\Gamma(\mathbb{P}_{k}^{n}, \mathcal{O}_{\mathbb{P}_{k}^{n}}(d))$ that are monomial of degree $d$ with coefficient $1$.
     \par
     For Segre embedding $\mathbb{P}_{k}^{n} \times \mathbb{P}_{k}^{m} \hookrightarrow \mathbb{P}_{k}^{nm + n + m}$,
     similarly, it is given by sections in $\Gamma(\mathbb{P}_{k}^{n} \times \mathbb{P}_{k}^{m}, \mathcal{O}_{\mathbb{P}_{k}^{n}}(1) \boxtimes \mathcal{O}_{\mathbb{P}_{k}^{m}}(1))$ that are $x_{i}y_{j}$,
